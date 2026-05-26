@@ -22,9 +22,9 @@ Fluxo:
 . Remove backups antigos
 . Envia status no Telegram
 Exemplo:
-![Backup SharePoint](./Imagens/backupsharepoint.jpg)
-![Telegram](./Imagens/backuptelegram.jpg)
-![Log](./Imagens/log.jpg)
+![Backup SharePoint](./backup-automation/Imagens/backupsharepoint.jpg)
+![Telegram](./backup-automation/Imagens/backuptelegram.jpg)
+![Log](./backup-automation/Imagens/log.jpg)
 
 Aprendizados:
 . Execução de scripts com cron
