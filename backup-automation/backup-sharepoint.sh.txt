@@ -1,0 +1,25 @@
+backup-sharepoint.sh
+#!/bin/bash
+
+DATA=$(date +%F)
+LOG="/home/caina/rclone-backup.log"
+
+echo "===== Backup iniciado: $DATA =====" >> $LOG
+
+# Backup docker
+/usr/bin/rclone --config /home/caina/.config/rclone/rclone.conf sync /backup/docker "sharepoint:Backup Servidor Inovax/docker" >> $LOG 2>&1 || exit 1
+
+# Backup configs
+/usr/bin/rclone --config /home/caina/.config/rclone/rclone.conf copy /backup "sharepoint:Backup Servidor Inovax/config" --include "*.tar.gz" >> $LOG 2>&1 || exit 1
+
+# Backup files
+/usr/bin/rclone --config /home/caina/.config/rclone/rclone.conf copy /backup/files "sharepoint:Backup Servidor Inovax/files" --include "*.tar.gz" >> $LOG 2>&1 || exit 1
+
+# Limpeza local
+find /backup -type f -name "*.tar.gz" -mtime +7 -delete >> $LOG 2>&1
+
+# Limpeza SharePoint
+/usr/bin/rclone --config /home/caina/.config/rclone/rclone.conf delete "sharepoint:Backup Servidor Inovax/config" --min-age 7d >> $LOG 2>&1 || exit 1
+/usr/bin/rclone --config /home/caina/.config/rclone/rclone.conf delete "sharepoint:Backup Servidor Inovax/files" --min-age 7d >> $LOG 2>&1 || exit 1
+
+echo "===== Backup finalizado: $(date) =====" >> $LOG

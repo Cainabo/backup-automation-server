@@ -1,0 +1,65 @@
+backup-all.sh
+#!/bin/bash
+
+# CONFIG
+TELEGRAM="/usr/local/bin/send-telegram.sh"
+DATA=$(date "+%Y-%m-%d %H:%M:%S")
+START_TIME=$(date +%s)
+
+STATUS_CONFIG=0
+STATUS_DOCKER=0
+STATUS_FILES=0
+STATUS_SHAREPOINT=0
+
+# INÍCIO
+$TELEGRAM "🚀 Backup iniciado em $DATA"
+
+echo "===== BACKUP INICIADO: $DATA ====="
+
+# BACKUP CONFIG
+bash /usr/local/bin/backup-config.sh
+STATUS_CONFIG=$?
+
+# BACKUP DOCKER
+bash /usr/local/bin/backup-docker.sh
+STATUS_DOCKER=$?
+
+# BACKUP FILES
+bash /usr/local/bin/backup-files.sh
+STATUS_FILES=$?
+
+# BACKUP SHAREPOINT
+bash /usr/local/bin/backup-sharepoint.sh
+STATUS_SHAREPOINT=$?
+
+# TEMPO DE EXECUÇÃO
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+# MONTAR STATUS FINAL
+MSG="📊 STATUS DO BACKUP
+
+Config: $([ $STATUS_CONFIG -eq 0 ] && echo '✅ OK' || echo '❌ ERRO')
+Docker: $([ $STATUS_DOCKER -eq 0 ] && echo '✅ OK' || echo '❌ ERRO')
+Files: $([ $STATUS_FILES -eq 0 ] && echo '✅ OK' || echo '❌ ERRO')
+SharePoint: $([ $STATUS_SHAREPOINT -eq 0 ] && echo '✅ OK' || echo '❌ ERRO')
+
+⏱ Tempo: ${DURATION}s"
+
+# ENVIO FINAL
+if [ $STATUS_CONFIG -eq 0 ] && \
+   [ $STATUS_DOCKER -eq 0 ] && \
+   [ $STATUS_FILES -eq 0 ] && \
+   [ $STATUS_SHAREPOINT -eq 0 ]; then
+
+    $TELEGRAM "✅ Backup concluído com sucesso!
+
+$MSG"
+
+else
+
+    $TELEGRAM "❌ ERRO NO BACKUP!
+
+$MSG"
+
+fi
